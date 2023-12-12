@@ -1,40 +1,33 @@
 package main
 
 import (
-	"fmt"
-	"golangRestaurantManagement/middleware"
-	"golangRestaurantManagement/routes"
-	"os"
-
-	"github.com/gin-gonic/gin"
+	"database/sql"
+	_ "github.com/lib/pq"
+	"golangRestaurantManagement/api"
+	db "golangRestaurantManagement/db/sqlc"
+	"log"
 )
 
-func init() {
-	gin.SetMode(gin.ReleaseMode)
-}
-
-//var foodCollection *mongo.Collection = db.OpenCollection(db.Client, "food")
+const (
+	dbDriver      = "postgres"
+	dbSource      = "user=postgres password=postgres dbname=restaurantDB sslmode=disable" //"postgresql://root:postgres@locallhost:5432/restaurantDB?sslmode=disable"
+	serverAddress = "0.0.0.0:8080"
+)
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = ":8080"
+	//connStr := "user=postgres password=postgres dbname=restaurantDB sslmode=disable"
+	//conn, err := sql.Open("postgres", connStr)
+
+	conn, err := sql.Open(dbDriver, dbSource)
+	if err != nil {
+		log.Fatal("cannot connection db", err)
 	}
 
-	router := gin.New()
-	gin.SetMode(gin.ReleaseMode)
-	router.Use(gin.Logger())
-	routes.UserRoutes(router)
-	router.Use(middleware.Authentication())
+	store := db.Newstore(conn)
+	server := api.NewServer(store)
 
-	routes.FoodRoutes(router)
-	routes.MenuRoutes(router)
-	routes.TablaeRoutes(router)
-	routes.OrderRoutes(router)
-	routes.OrderItemroutes(router)
-	routes.InvoiceRoutes(router)
-
-	fmt.Println(port, ": connected")
-	router.Run(port)
-
+	err = server.Start(serverAddress)
+	if err != nil {
+		log.Fatal("cannot start server", err)
+	}
 }
