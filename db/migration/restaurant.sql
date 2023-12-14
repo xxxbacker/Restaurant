@@ -15,6 +15,14 @@ CREATE TABLE IF NOT EXISTS courier (
     phone varchar(50) not null
     );
 
+CREATE TABLE IF NOT EXISTS ord (
+    ord_id SERIAL PRIMARY KEY,
+    ord_date date NOT NULL,
+    created_at timestamp NOT,
+    account_id BIGINT references account(account_id),
+    courier_id BIGINT references courier(courier_id)
+    );
+
 CREATE TABLE IF NOT EXISTS cheque (
     cheque_id serial primary key ,
     price int not null,
@@ -22,14 +30,6 @@ CREATE TABLE IF NOT EXISTS cheque (
     pay_status varchar(50) not null,
     created_at timestamp not null,
     ord_id BIGINT references ord(ord_id)
-    );
-
-CREATE TABLE IF NOT EXISTS ord (
-    ord_id SERIAL PRIMARY KEY,
-    ord_date date NOT NULL,
-    created_at timestamp NOT,
-    account_id BIGINT references account(account_id),
-    courier_id BIGINT references courier(courier_id)
     );
 
 CREATE TABLE IF NOT EXISTS menu_item (

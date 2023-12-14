@@ -4,15 +4,21 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	db "golangRestaurantManagement/db/sqlc"
+	"golangRestaurantManagement/utils"
 	"net/http"
 )
 
-type getOrdRequest struct {
+const (
+	courierIdCtx = "courierId"
+	ordIdCtx     = "ordId"
+)
+
+type getOrdForAdminRequest struct {
 	ID int32 `uri:"id" binding:"required"`
 }
 
-func (server *Server) getOrd(ctx *gin.Context) {
-	var req getOrdRequest
+func (server *Server) getOrdForAdmin(ctx *gin.Context) {
+	var req getOrdForAdminRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
 		return
@@ -25,34 +31,50 @@ func (server *Server) getOrd(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, ord)
 }
 
-type createOrdRequest struct {
-	AccountID int32 `json:"account_id" binding:"required"`
-	CourierID int32 `json:"courier_id" binding:"required"`
+func (server *Server) getOrdForUser(ctx *gin.Context) {
+	ordId, err := getOrdId(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ord, err := server.store.GetOrd(ctx, ordId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, ord)
 }
 
 func (server *Server) createOrd(ctx *gin.Context) {
-	var req createOrdRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errResponse(err))
+	accountId, err := getAccountId(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
-	account, val := server.validAccount(ctx, req.AccountID)
-	if !val {
+	account, err := server.store.GetAccount(ctx, int32(accountId))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
 
-	courier, valid := server.validCourier(ctx, req.CourierID)
-	if !valid {
+	n := utils.RandomModuloTen()
+	courier, err := server.store.GetCourier(ctx, n)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
+
+	ctx.Set(courierIdCtx, courier.CourierID)
+	ctx.Next()
+
 	arg := db.CreateOrdParams{
 		AccountID: sql.NullInt64{
 			Int64: int64(account.AccountID),
-			Valid: val,
+			Valid: true,
 		},
 		CourierID: sql.NullInt64{
 			Int64: int64(courier.CourierID),
-			Valid: valid,
+			Valid: true,
 		},
 	}
 
@@ -62,26 +84,9 @@ func (server *Server) createOrd(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, ord)
-}
 
-func (server *Server) validAccount(ctx *gin.Context, accountId int32) (db.Account, bool) {
-	account, err := server.store.GetAccount(ctx, accountId)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errResponse(err))
-		return account, false
-	}
-
-	return account, true
-}
-
-func (server *Server) validCourier(ctx *gin.Context, courierId int32) (db.Courier, bool) {
-	courier, err := server.store.GetCourier(ctx, courierId)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errResponse(err))
-		return courier, false
-	}
-
-	return courier, true
+	ctx.Set(ordIdCtx, ord.OrdID)
+	ctx.Next()
 }
 
 type listOrdRequest struct {

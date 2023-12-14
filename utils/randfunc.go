@@ -13,8 +13,8 @@ type createCourierRequest struct {
 func CreateRandomCourierRequest() *createCourierRequest {
 	rand.Seed(time.Now().UnixNano())
 
-	title := randString(5)
-	phone := "8" + randString(10)
+	title := RandString(5)
+	phone := "8" + RandString(10)
 
 	return &createCourierRequest{
 		Title: title,
@@ -22,12 +22,18 @@ func CreateRandomCourierRequest() *createCourierRequest {
 	}
 }
 
-func randString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+func RandString(length int) string {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = charset[rand.Intn(len(charset))]
 	}
 	return string(b)
 
+}
+
+func RandomModuloTen() int32 {
+	rand.Seed(time.Now().UnixNano())
+	randomNumber := rand.Intn(100)
+	return int32(randomNumber % 10)
 }

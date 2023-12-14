@@ -26,13 +26,20 @@ func NewServer(store *db.Store) *Server {
 	{
 		admin := api.Group("/admin")
 		{
-			// вот здесь я просто накидал для примера
-			admin.POST("/ListMenu", server.listMenuItem)
+			admin.GET("/getAccount/:id", server.getAccountForAdmin)
+			admin.POST("/listAccount", server.listAccount)
+			admin.POST("/createCourier", server.createCourier)
+			admin.GET("/getCourier/:id", server.getCourier)
+			admin.POST("/listCourier", server.listCourier)
+			admin.GET("/getOrder/:id", server.getOrdForAdmin)
+			admin.POST("/listOrder", server.listOrd)
+
 		}
 		user := api.Group("/user")
 		{
-			// вот здесь я просто накидал для примера
-			user.POST("/ListMenu", server.listMenuItem)
+			user.GET("/getAccount", server.getAccountForUser)
+			user.POST("/createOrder", server.createOrd)
+			user.GET("/getOrder", server.getOrdForUser)
 		}
 	}
 

@@ -6,17 +6,32 @@ import (
 	"net/http"
 )
 
-type getAccountRequest struct {
+type getAccountForAdminRequest struct {
 	ID int32 `uri:"id" binding:"required"`
 }
 
-func (server *Server) getAccount(ctx *gin.Context) {
-	var req getAccountRequest
+func (server *Server) getAccountForAdmin(ctx *gin.Context) {
+	var req getAccountForAdminRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
 		return
 	}
 	account, err := server.store.GetAccount(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, account)
+}
+
+func (server *Server) getAccountForUser(ctx *gin.Context) {
+	accountId, err := getAccountId(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	account, err := server.store.GetAccount(ctx, int32(accountId))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
