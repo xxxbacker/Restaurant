@@ -67,3 +67,17 @@ func getChequeId(c *gin.Context) (int32, error) {
 
 	return idInt, nil
 }
+
+func getMenuItemId(c *gin.Context) (int32, error) {
+	id, ok := c.Get(menuItemIdCtx)
+	if !ok {
+		return 0, errors.New("ord id not found")
+	}
+
+	idInt, ok := id.(int32)
+	if !ok {
+		return 0, errors.New("ord id is of invalid type")
+	}
+
+	return idInt, nil
+}

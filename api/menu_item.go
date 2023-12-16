@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-type getMenuItemRequest struct {
+/* type getMenuItemRequest struct {
 	ID int32 `uri:"id" binding:"required"`
 }
 
-/*func (server *Server) getMenuItemForAdmin(ctx *gin.Context) {
+func (server *Server) getMenuItemForAdmin(ctx *gin.Context) {
 	var req getMenuItemRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))

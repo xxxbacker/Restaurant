@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
 type errorResponse struct {
@@ -10,6 +9,5 @@ type errorResponse struct {
 }
 
 func NewErrorResponse(c *gin.Context, statusCode int, message string) {
-	log.Fatal(message)
 	c.AbortWithStatusJSON(statusCode, errorResponse{message})
 }

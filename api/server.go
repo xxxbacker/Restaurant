@@ -26,17 +26,19 @@ func NewServer(store *db.Store) *Server {
 	{
 		admin := api.Group("/admin")
 		{
-			admin.GET("/getAccount/:id", server.getAccountForAdmin)
+			//admin.GET("/getAccount/:id", server.getAccountForAdmin)
 			admin.POST("/listAccount", server.listAccount)
 			admin.POST("/createCourier", server.createCourier)
-			admin.GET("/getCourier/:id", server.getCourier)
-			admin.POST("/listCourier", server.listCourier)
-			admin.GET("/getOrder/:id", server.getOrdForAdmin)
-			admin.POST("/listOrder", server.listOrd)
-			admin.GET("/getCheque/:id", server.getChequeForAdmin)
-			admin.POST("/listCheque", server.listCheque)
+			//admin.GET("/getCourier/:id", server.getCourier)
+			//admin.POST("/listCourier", server.listCourier)
+			//admin.GET("/getOrder/:id", server.getOrdForAdmin)
+			//admin.POST("/listOrder", server.listOrd)
+			//admin.POST("/listCheque", server.listCheque)
+			//admin.GET("/getCheque/:id", server.getChequeForAdmin)
 			admin.POST("/createMenuItem", server.createMenuItem)
 			admin.POST("/listMenuItem", server.listMenuItem)
+			admin.DELETE("/deleteMenuItem", server.DeleteMenuItem)
+			//admin.POST("/listOrderItems", server.listOrderItem)
 		}
 		user := api.Group("/user")
 		{
@@ -46,6 +48,7 @@ func NewServer(store *db.Store) *Server {
 			user.POST("/createCheque", server.createCheque)
 			user.GET("/getCheque", server.getChequeForUser)
 			user.POST("/listMenuItem", server.listMenuItem)
+			user.POST("/createOrderItem", server.createOrderItem)
 		}
 	}
 
