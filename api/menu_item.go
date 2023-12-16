@@ -10,7 +10,7 @@ type getMenuItemRequest struct {
 	ID int32 `uri:"id" binding:"required"`
 }
 
-func (server *Server) getMenuItem(ctx *gin.Context) {
+/*func (server *Server) getMenuItemForAdmin(ctx *gin.Context) {
 	var req getMenuItemRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
@@ -22,7 +22,7 @@ func (server *Server) getMenuItem(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, menuItem)
-}
+} */
 
 type createMenuItemRequest struct {
 	Title    string `json:"title" binding:"required"`
@@ -45,6 +45,9 @@ func (server *Server) createMenuItem(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, menuItem)
+
+	ctx.Set(menuItemIdCtx, menuItem.MenuID)
+	ctx.Next()
 }
 
 type listMenuItemRequest struct {
@@ -68,4 +71,23 @@ func (server *Server) listMenuItem(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, menuItem)
+}
+
+type deleteMenuItemRequest struct {
+	ID int32 `uri:"id" binding:"required"`
+}
+
+func (server *Server) DeleteMenuItem(ctx *gin.Context) {
+	var req deleteMenuItemRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errResponse(err))
+		return
+	}
+
+	err := server.store.DeleteMenu_item(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, true)
 }

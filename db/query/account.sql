@@ -1,8 +1,8 @@
 -- name: CreateAccount :one
 INSERT INTO account (
-    post, first_name, last_name, password, email, phone, created_at
+    post, nickname, password, phone, created_at
 ) VALUES (
-             $1, $2, $3, $4, $5, $6, $7
+             $1, $2, $3, $4, $5
          )
     RETURNING *;
 

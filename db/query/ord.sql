@@ -1,8 +1,8 @@
 -- name: CreateOrd :one
 INSERT INTO ord (
-    account_id, courier_id
+    account_id, courier_id, created_at
 ) VALUES (
-             $1, $2
+             $1, $2, $3
          )
     RETURNING *;
 

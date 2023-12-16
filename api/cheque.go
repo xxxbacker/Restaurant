@@ -5,13 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	db "golangRestaurantManagement/db/sqlc"
 	"net/http"
+	"time"
 )
 
 type getChequeRequest struct {
 	ID int32 `uri:"id" binding:"required"`
 }
 
-func (server *Server) getCheque(ctx *gin.Context) {
+func (server *Server) getChequeForAdmin(ctx *gin.Context) {
 	var req getChequeRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
@@ -25,9 +26,22 @@ func (server *Server) getCheque(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, cheque)
 }
 
+func (server *Server) getChequeForUser(ctx *gin.Context) {
+	chequeId, err := getChequeId(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	cheque, err := server.store.GetCheque(ctx, chequeId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, cheque)
+}
+
 type createChequeRequest struct {
 	Price int32 `json:"price" binding:"required"`
-	OrdId int32 `json:"ord_id" binding:"required"`
 }
 
 func (server *Server) createCheque(ctx *gin.Context) {
@@ -36,8 +50,15 @@ func (server *Server) createCheque(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
 		return
 	}
-	ord, val := server.validOrd(ctx, req.OrdId)
-	if !val {
+
+	ordId, err := getOrdId(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+	ord, err := server.store.GetOrd(ctx, ordId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
 
@@ -45,8 +66,9 @@ func (server *Server) createCheque(ctx *gin.Context) {
 		Price: req.Price,
 		OrdID: sql.NullInt64{
 			Int64: int64(ord.OrdID),
-			Valid: val,
+			Valid: true,
 		},
+		CreatedAt: time.Now(),
 	}
 
 	cheque, err := server.store.CreateCheque(ctx, arg)
@@ -55,16 +77,9 @@ func (server *Server) createCheque(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, cheque)
-}
 
-func (server *Server) validOrd(ctx *gin.Context, ordId int32) (db.Ord, bool) {
-	ord, err := server.store.GetOrd(ctx, ordId)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errResponse(err))
-		return ord, false
-	}
-
-	return ord, true
+	ctx.Set(chequeIdCtx, cheque.ChequeID)
+	ctx.Next()
 }
 
 type listChequeRequest struct {

@@ -13,8 +13,6 @@ import (
 
 const (
 	authorizationHeader = "Authorization"
-	accountIdCtx        = "userId"
-	accountPostCtx      = "userPost"
 	signingKey          = "1234567890123456789012345678"
 	tokenTTL            = 12 * time.Hour
 )
@@ -95,46 +93,4 @@ func (server *Server) accountIdentity(c *gin.Context) {
 	c.Set(accountIdCtx, userId)
 	c.Set(accountPostCtx, userPost)
 	c.Next()
-}
-
-func getAccountId(c *gin.Context) (int, error) {
-	id, ok := c.Get(accountIdCtx)
-	if !ok {
-		return 0, errors.New("user id not found")
-	}
-
-	idInt, ok := id.(int)
-	if !ok {
-		return 0, errors.New("user id is of invalid type")
-	}
-
-	return idInt, nil
-}
-
-func getOrdId(c *gin.Context) (int32, error) {
-	id, ok := c.Get(ordIdCtx)
-	if !ok {
-		return 0, errors.New("ord id not found")
-	}
-
-	idInt, ok := id.(int32)
-	if !ok {
-		return 0, errors.New("ord id is of invalid type")
-	}
-
-	return idInt, nil
-}
-
-func getAccountPostId(c *gin.Context) (string, error) {
-	post, ok := c.Get(accountPostCtx)
-	if !ok {
-		return "", errors.New("user id not found")
-	}
-
-	postStr, ok := post.(string)
-	if !ok {
-		return "", errors.New("user id is of invalid type")
-	}
-
-	return postStr, nil
 }

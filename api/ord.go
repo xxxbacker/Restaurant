@@ -6,6 +6,7 @@ import (
 	db "golangRestaurantManagement/db/sqlc"
 	"golangRestaurantManagement/utils"
 	"net/http"
+	"time"
 )
 
 const (
@@ -76,6 +77,7 @@ func (server *Server) createOrd(ctx *gin.Context) {
 			Int64: int64(courier.CourierID),
 			Valid: true,
 		},
+		CreatedAt: time.Now(),
 	}
 
 	ord, err := server.store.CreateOrd(ctx, arg)

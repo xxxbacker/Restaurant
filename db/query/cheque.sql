@@ -1,8 +1,8 @@
 -- name: CreateCheque :one
 INSERT INTO cheque (
-    price, ord_id
+    price, ord_id, created_at
 ) VALUES (
-             $1, $2
+             $1, $2, $3
          )
     RETURNING *;
 

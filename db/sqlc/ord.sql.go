@@ -8,13 +8,14 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createOrd = `-- name: CreateOrd :one
 INSERT INTO ord (
-    account_id, courier_id
+    account_id, courier_id, created_at
 ) VALUES (
-             $1, $2
+             $1, $2, $3
          )
     RETURNING ord_id, ord_date, created_at, account_id, courier_id
 `
@@ -22,10 +23,11 @@ INSERT INTO ord (
 type CreateOrdParams struct {
 	AccountID sql.NullInt64 `json:"account_id"`
 	CourierID sql.NullInt64 `json:"courier_id"`
+	CreatedAt time.Time     `json:"created_at"`
 }
 
 func (q *Queries) CreateOrd(ctx context.Context, arg CreateOrdParams) (Ord, error) {
-	row := q.db.QueryRowContext(ctx, createOrd, arg.AccountID, arg.CourierID)
+	row := q.db.QueryRowContext(ctx, createOrd, arg.AccountID, arg.CourierID, arg.CreatedAt)
 	var i Ord
 	err := row.Scan(
 		&i.OrdID,

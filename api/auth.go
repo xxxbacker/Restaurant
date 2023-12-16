@@ -9,12 +9,10 @@ import (
 )
 
 type createAccountRequest struct {
-	Post      string `json:"post" binding:"required"`
-	FirstName string `json:"first_name" binding:"required"`
-	LastName  string `json:"last_name" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	Phone     string `json:"phone" binding:"required"`
+	Post     string `json:"post" binding:"required"`
+	NickName string `json:"nickname" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
 }
 
 func (server *Server) signUp(ctx *gin.Context) {
@@ -26,10 +24,8 @@ func (server *Server) signUp(ctx *gin.Context) {
 
 	arg := db.CreateAccountParams{
 		Post:      "user",
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
+		Nickname:  req.NickName,
 		Password:  utils.GeneratePasswordHash(req.Password),
-		Email:     req.Email,
 		Phone:     req.Phone,
 		CreatedAt: time.Now(),
 	}

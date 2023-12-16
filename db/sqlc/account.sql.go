@@ -12,19 +12,17 @@ import (
 
 const createAccount = `-- name: CreateAccount :one
 INSERT INTO account (
-    post, first_name, last_name, password, email, phone, created_at
+    post, nickname, password, phone, created_at
 ) VALUES (
-             $1, $2, $3, $4, $5, $6, $7
+             $1, $2, $3, $4, $5
          )
-    RETURNING account_id, post, first_name, last_name, password, email, phone, created_at
+    RETURNING account_id, post, nickname, password, phone, created_at
 `
 
 type CreateAccountParams struct {
 	Post      string    `json:"post"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
+	Nickname  string    `json:"nickname"`
 	Password  string    `json:"password"`
-	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -32,10 +30,8 @@ type CreateAccountParams struct {
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
 	row := q.db.QueryRowContext(ctx, createAccount,
 		arg.Post,
-		arg.FirstName,
-		arg.LastName,
+		arg.Nickname,
 		arg.Password,
-		arg.Email,
 		arg.Phone,
 		arg.CreatedAt,
 	)
@@ -43,10 +39,8 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 	err := row.Scan(
 		&i.AccountID,
 		&i.Post,
-		&i.FirstName,
-		&i.LastName,
+		&i.Nickname,
 		&i.Password,
-		&i.Email,
 		&i.Phone,
 		&i.CreatedAt,
 	)
@@ -64,7 +58,7 @@ func (q *Queries) DeleteAccount(ctx context.Context, accountID int32) error {
 }
 
 const getAccount = `-- name: GetAccount :one
-SELECT account_id, post, first_name, last_name, password, email, phone, created_at FROM account
+SELECT account_id, post, nickname, password, phone, created_at FROM account
 WHERE account_id = $1 LIMIT 1
 `
 
@@ -74,10 +68,8 @@ func (q *Queries) GetAccount(ctx context.Context, accountID int32) (Account, err
 	err := row.Scan(
 		&i.AccountID,
 		&i.Post,
-		&i.FirstName,
-		&i.LastName,
+		&i.Nickname,
 		&i.Password,
-		&i.Email,
 		&i.Phone,
 		&i.CreatedAt,
 	)
@@ -85,7 +77,7 @@ func (q *Queries) GetAccount(ctx context.Context, accountID int32) (Account, err
 }
 
 const getAccountForPassword = `-- name: GetAccountForPassword :one
-SELECT account_id, post, first_name, last_name, password, email, phone, created_at FROM account
+SELECT account_id, post, nickname, password, phone, created_at FROM account
 WHERE phone = $1 and password = $2
 LIMIT 1
 `
@@ -101,10 +93,8 @@ func (q *Queries) GetAccountForPassword(ctx context.Context, arg GetAccountForPa
 	err := row.Scan(
 		&i.AccountID,
 		&i.Post,
-		&i.FirstName,
-		&i.LastName,
+		&i.Nickname,
 		&i.Password,
-		&i.Email,
 		&i.Phone,
 		&i.CreatedAt,
 	)
@@ -112,7 +102,7 @@ func (q *Queries) GetAccountForPassword(ctx context.Context, arg GetAccountForPa
 }
 
 const listAccounts = `-- name: ListAccounts :many
-SELECT account_id, post, first_name, last_name, password, email, phone, created_at FROM account
+SELECT account_id, post, nickname, password, phone, created_at FROM account
 ORDER BY account_id
     LIMIT $1
 OFFSET $2
@@ -135,10 +125,8 @@ func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]A
 		if err := rows.Scan(
 			&i.AccountID,
 			&i.Post,
-			&i.FirstName,
-			&i.LastName,
+			&i.Nickname,
 			&i.Password,
-			&i.Email,
 			&i.Phone,
 			&i.CreatedAt,
 		); err != nil {

@@ -12,10 +12,8 @@ import (
 type Account struct {
 	AccountID int32     `json:"account_id"`
 	Post      string    `json:"post"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
+	Nickname  string    `json:"nickname"`
 	Password  string    `json:"password"`
-	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
 	CreatedAt time.Time `json:"created_at"`
 }

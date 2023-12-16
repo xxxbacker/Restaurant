@@ -8,24 +8,26 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createCheque = `-- name: CreateCheque :one
 INSERT INTO cheque (
-    price, ord_id
+    price, ord_id, created_at
 ) VALUES (
-             $1, $2
+             $1, $2, $3
          )
     RETURNING cheque_id, price, pay_method, pay_status, created_at, ord_id
 `
 
 type CreateChequeParams struct {
-	Price int32         `json:"price"`
-	OrdID sql.NullInt64 `json:"ord_id"`
+	Price     int32         `json:"price"`
+	OrdID     sql.NullInt64 `json:"ord_id"`
+	CreatedAt time.Time     `json:"created_at"`
 }
 
 func (q *Queries) CreateCheque(ctx context.Context, arg CreateChequeParams) (Cheque, error) {
-	row := q.db.QueryRowContext(ctx, createCheque, arg.Price, arg.OrdID)
+	row := q.db.QueryRowContext(ctx, createCheque, arg.Price, arg.OrdID, arg.CreatedAt)
 	var i Cheque
 	err := row.Scan(
 		&i.ChequeID,
