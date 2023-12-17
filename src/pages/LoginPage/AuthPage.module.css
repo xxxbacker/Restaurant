@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.LoginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 320px;
+    margin-bottom: 0.5em;
+}
+
+.swapLink {
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      color: red;
+    }
+}
+.swapWrapper, .label {
+    display: flex;
+    gap: 5px;
+    user-select: none;
+}
