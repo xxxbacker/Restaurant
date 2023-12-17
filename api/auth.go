@@ -9,7 +9,6 @@ import (
 )
 
 type createAccountRequest struct {
-	Post     string `json:"post" binding:"required"`
 	NickName string `json:"nickname" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Phone    string `json:"phone" binding:"required"`
